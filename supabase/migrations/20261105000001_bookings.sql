@@ -41,7 +41,7 @@ create table if not exists public.bookings (
 
   status         text not null default 'new'
                  check (status in ('new', 'contacted', 'confirmed', 'completed', 'cancelled')),
-  source         text not null default 'website'
+  source         text not null default 'website' check (char_length(source) between 2 and 30)
 );
 
 create index if not exists bookings_created_at_idx     on public.bookings (created_at desc);

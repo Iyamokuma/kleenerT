@@ -10,6 +10,7 @@ const key = env.VITE_SUPABASE_PUBLISHABLE_KEY
 export const isSupabaseConfigured = Boolean(url && key);
 
 // Null until the env vars are set, so the booking form can fall back to email.
+// Sessions persist so admins stay signed in to /admin.
 export const supabase = isSupabaseConfigured
-  ? createClient(url, key, { auth: { persistSession: false } })
+  ? createClient(url, key, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } })
   : null;
