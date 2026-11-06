@@ -445,7 +445,10 @@ html:has(.drawer[open]), html:has(.adm-dialog[open]) { overflow: hidden; }
 .admin-list small { font-size: .8rem; color: var(--ink-soft); }
 .you { margin-left: 8px; padding: 1px 8px; border-radius: 999px; background: var(--sky-100); color: var(--st-new-fg); font-size: .72rem; font-weight: 700; }
 .inline-form { display: flex; gap: 8px; }
-.inline-form input { flex: 1; min-width: 0; height: 38px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--line); font-size: .9rem; }
+.inline-form { flex-wrap: wrap; }
+.inline-form input { flex: 1 1 200px; min-width: 0; height: 38px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--line); font-size: .9rem; }
+.inline-form .inline-form-short { flex: 0 1 170px; }
+.admin-list small b { color: var(--navy-800); font-weight: 700; }
 
 /* Responsive ---------------------------------------------------------------------------------------------- */
 @media (max-width: 1180px) {

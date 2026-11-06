@@ -1,7 +1,7 @@
 -- ============================================================================
 -- Kleener Touch · 002 · Admin dashboard
 --
--- • admin_users: allow-list of staff emails that may sign in to /admin
+-- • admin_users: allow-list of staff emails (and optional usernames) for /admin
 -- • Operational columns on bookings (assignee, schedule, quote)
 -- • booking_events: activity timeline, written automatically by triggers
 -- • admin_dashboard_stats(): one call for the overview page
@@ -21,9 +21,13 @@ create table if not exists public.admin_users (
   added_by text
 );
 
-insert into public.admin_users (email, added_by)
-values ('booking.kleenertouch@gmail.com', 'setup')
-on conflict (email) do nothing;
+-- Optional short sign-in name, e.g. "osasofkleener" instead of the full email.
+alter table public.admin_users
+  add column if not exists username text unique check (username is null or username ~ '^[a-z0-9._-]{3,32}$');
+
+insert into public.admin_users (email, username, added_by)
+values ('booking.kleenertouch@gmail.com', 'osasofkleener', 'setup')
+on conflict (email) do update set username = coalesce(public.admin_users.username, excluded.username);
 
 -- True only for a signed-in user whose *confirmed* email is on the allow-list.
 create or replace function public.is_admin()
@@ -44,6 +48,25 @@ $$;
 
 revoke all on function public.is_admin() from public, anon;
 grant execute on function public.is_admin() to authenticated;
+
+-- The sign-in form accepts a username or an email. Supabase Auth signs in by email,
+-- so this turns an admin username into its email (null if unknown). It reveals
+-- nothing about bookings, and a password is still required.
+create or replace function public.admin_login_email(p_login text)
+returns text
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select case
+    when position('@' in coalesce(p_login, '')) > 0 then lower(trim(p_login))
+    else (select email from public.admin_users where username = lower(trim(p_login)))
+  end;
+$$;
+
+revoke all on function public.admin_login_email(text) from public;
+grant execute on function public.admin_login_email(text) to anon, authenticated;
 
 alter table public.admin_users enable row level security;
 revoke all on public.admin_users from anon, authenticated;

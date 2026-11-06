@@ -72,17 +72,24 @@ function AdminsCard() {
   const queryClient = useQueryClient();
   const toast = useToast();
   const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [removing, setRemoving] = useState(null);
   const { data: admins, isLoading, error } = useQuery({ queryKey: ['admins'], queryFn: fetchAdmins });
 
   const add = useMutation({
-    mutationFn: () => addAdmin(email, me),
+    mutationFn: () => addAdmin({ email, username }, me),
     onSuccess: () => {
       toast({ title: 'Admin added', body: `${email.trim().toLowerCase()} can sign in once their account exists.` });
       setEmail('');
+      setUsername('');
       queryClient.invalidateQueries({ queryKey: ['admins'] });
     },
-    onError: (err) => toast({ tone: 'error', title: 'Couldn’t add admin', body: err.code === '23505' ? 'That email is already an admin.' : err.message }),
+    onError: (err) => toast({
+      tone: 'error',
+      title: 'Couldn’t add admin',
+      body: err.code === '23505' ? 'That email or username is already taken.'
+        : err.code === '23514' ? 'Usernames are 3–32 letters, numbers, dots, dashes or underscores.' : err.message,
+    }),
   });
 
   const remove = useMutation({
@@ -109,7 +116,7 @@ function AdminsCard() {
               <Avatar name={a.email.split('@')[0].replace(/[._-]/g, ' ')} />
               <div>
                 <strong>{a.email}{a.email === me && <span className="you">You</span>}</strong>
-                <small>Added {formatDay(a.added_at.slice(0, 10), { day: 'numeric', month: 'short', year: 'numeric' })}{a.added_by && a.added_by !== 'setup' ? ` by ${a.added_by}` : ''}</small>
+                <small>{a.username && <>Username <b>{a.username}</b> · </>}Added {formatDay(a.added_at.slice(0, 10), { day: 'numeric', month: 'short', year: 'numeric' })}{a.added_by && a.added_by !== 'setup' ? ` by ${a.added_by}` : ''}</small>
               </div>
               {a.email !== me && (
                 <button type="button" className="icon-btn" onClick={() => setRemoving(a.email)} aria-label={`Remove ${a.email}`}><Icon name="trash" /></button>
@@ -120,6 +127,7 @@ function AdminsCard() {
       )}
       <form className="inline-form" onSubmit={(e) => { e.preventDefault(); if (email.trim()) add.mutate(); }}>
         <input type="email" placeholder="colleague@example.com" value={email} onChange={(e) => setEmail(e.target.value)} aria-label="Email to add as admin" required />
+        <input placeholder="Username (optional)" value={username} onChange={(e) => setUsername(e.target.value)} aria-label="Username (optional)" maxLength={32} autoCapitalize="none" className="inline-form-short" />
         <button type="submit" className="btn btn-primary btn-sm" disabled={add.isPending}><Icon name="plus" /> Add admin</button>
       </form>
       <ConfirmDialog

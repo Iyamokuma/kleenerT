@@ -25,6 +25,8 @@ npm run dev
 
 `VITE_` prefixes work too. Both values are public by design: the database's row-level security decides what they can do. **Never** put the `service_role` / secret key in this project.
 
+Production builds read them from the committed `.env.production`, so a deploy works without extra setup. Values set in Vercel's dashboard take priority.
+
 ## Deploy on Vercel
 
 1. Vercel → **Add New… → Project** → import `Iyamokuma/kleenerT`.
@@ -49,7 +51,9 @@ Visitors can't read, edit or delete bookings. The website's key can only call `c
 
 1. **Authentication → Sign In / Providers → Email**: turn **off** "Allow new users to sign up". Admin logins are created by hand.
 2. **Authentication → URL Configuration**: set **Site URL** to the live domain and add `https://<your-domain>/admin` to **Redirect URLs** (used by "Forgot password").
-3. **Authentication → Users → Add user → Create new user**: `booking.kleenertouch@gmail.com` with a strong password and **Auto Confirm User** ticked.
+3. **Authentication → Users**: the first admin is `booking.kleenertouch@gmail.com`, username **`osasofkleener`**. If the account isn't listed, use **Add user → Create new user** with **Auto Confirm User** ticked.
+
+Admins sign in at `/admin` with their **username or email**. Usernames live in `admin_users.username` and can be set when adding an admin in Settings.
 
 ## Booking flow
 

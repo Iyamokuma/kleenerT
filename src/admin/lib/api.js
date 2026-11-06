@@ -111,12 +111,23 @@ export async function fetchAdmins() {
   return unwrap(await supabase.from('admin_users').select('*').order('added_at'));
 }
 
-export async function addAdmin(email, addedBy) {
-  return unwrap(await supabase.from('admin_users').insert({ email: email.trim().toLowerCase(), added_by: addedBy }));
+export async function addAdmin({ email, username }, addedBy) {
+  return unwrap(await supabase.from('admin_users').insert({
+    email: email.trim().toLowerCase(),
+    username: username.trim().toLowerCase() || null,
+    added_by: addedBy,
+  }));
 }
 
 export async function removeAdmin(email) {
   return unwrap(await supabase.from('admin_users').delete().eq('email', email));
+}
+
+// Supabase Auth signs in by email; admins may type their username instead.
+export async function resolveLoginEmail(login) {
+  const value = login.trim();
+  if (value.includes('@')) return value.toLowerCase();
+  return unwrap(await supabase.rpc('admin_login_email', { p_login: value }));
 }
 
 export async function checkIsAdmin() {

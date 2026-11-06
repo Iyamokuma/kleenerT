@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { supabase } from '../../lib/supabase';
-import { checkIsAdmin } from '../lib/api';
+import { checkIsAdmin, resolveLoginEmail } from '../lib/api';
 
 const AuthContext = createContext(null);
 
@@ -50,11 +50,20 @@ export function AuthProvider({ children }) {
       user: session?.user ?? null,
       email: session?.user?.email?.toLowerCase() ?? '',
       name: session?.user?.user_metadata?.full_name?.trim() ?? '',
-      signIn: (email, password) => supabase.auth.signInWithPassword({ email: email.trim(), password }),
+      signIn: async (login, password) => {
+        const email = await resolveLoginEmail(login).catch(() => null);
+        // Same message for an unknown username as for a wrong password.
+        if (!email) return { error: { message: 'Invalid login credentials' } };
+        return supabase.auth.signInWithPassword({ email, password });
+      },
       signOut: () => supabase.auth.signOut(),
       updateProfile: (fullName) => supabase.auth.updateUser({ data: { full_name: fullName.trim() } }),
-      sendReset: (email) =>
-        supabase.auth.resetPasswordForEmail(email.trim(), { redirectTo: `${window.location.origin}/admin` }),
+      sendReset: async (login) => {
+        const email = await resolveLoginEmail(login).catch(() => null);
+        // Don't reveal whether a username exists.
+        if (!email) return { error: null };
+        return supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/admin` });
+      },
       updatePassword: async (password) => {
         const res = await supabase.auth.updateUser({ password });
         if (!res.error) setRecovery(false);

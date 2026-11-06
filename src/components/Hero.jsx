@@ -43,7 +43,6 @@ export default function Hero() {
         <Bubbles items={heroBubbles} />
 
         <div className="container hero-inner">
-          <span className="eyebrow eyebrow-glass"><span className="dot" />Facility Management &amp; One-Stop Facility Solutions</span>
           <h1>Keep your space <span className="accent">spotless</span> and working.</h1>
           <p className="lead">
             {company.slogan} Professional cleaning, housekeeping, facility management and pest control for homes,

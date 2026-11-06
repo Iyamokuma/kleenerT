@@ -34,7 +34,7 @@ function Message({ tone = 'error', children }) {
 export function LoginScreen() {
   const { signIn, sendReset } = useAuth();
   const [mode, setMode] = useState('signin'); // signin | reset
-  const [email, setEmail] = useState('');
+  const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState(null);
@@ -44,13 +44,13 @@ export function LoginScreen() {
     setBusy(true);
     setMsg(null);
     if (mode === 'signin') {
-      const { error } = await signIn(email, password);
-      if (error) setMsg({ tone: 'error', text: error.message === 'Invalid login credentials' ? 'Wrong email or password.' : error.message });
+      const { error } = await signIn(login, password);
+      if (error) setMsg({ tone: 'error', text: error.message === 'Invalid login credentials' ? 'Wrong username or password.' : error.message });
     } else {
-      const { error } = await sendReset(email);
+      const { error } = await sendReset(login);
       setMsg(error
         ? { tone: 'error', text: error.message }
-        : { tone: 'ok', text: 'If that email has an account, a reset link is on its way.' });
+        : { tone: 'ok', text: 'If that account exists, a reset link is on its way to its email.' });
     }
     setBusy(false);
   };
@@ -62,8 +62,17 @@ export function LoginScreen() {
     >
       <form className="auth-form" onSubmit={onSubmit}>
         <label className="field">
-          <span>Email</span>
-          <input type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+          <span>Username or email</span>
+          <input
+            type="text"
+            autoComplete="username"
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck={false}
+            required
+            value={login}
+            onChange={(e) => setLogin(e.target.value)}
+          />
         </label>
         {mode === 'signin' && (
           <label className="field">

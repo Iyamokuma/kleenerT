@@ -124,6 +124,11 @@ export async function submitBooking(form) {
   }
 
   const { data, error } = await supabase.rpc('create_booking', toRpcArgs(form));
+  // Database not set up yet (function missing): don't lose the booking, send it by email.
+  if (error?.code === 'PGRST202') {
+    window.location.href = mailtoFor(form);
+    return { via: 'email', reference: null };
+  }
   if (error) {
     // Validation and rate-limit messages from the database are written for customers.
     const friendly = error.code === '22023' || error.hint === 'rate_limited';
