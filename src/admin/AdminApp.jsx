@@ -2,7 +2,9 @@ import { useEffect } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { QueryClient, QueryClientProvider, useQueryClient } from '@tanstack/react-query';
 import { AuthProvider, useAuth } from './auth/AuthProvider';
-import { ForbiddenScreen, LoginScreen, SetPasswordScreen, SplashScreen, UnconfiguredScreen } from './auth/AuthScreens';
+import {
+  ForbiddenScreen, LoginScreen, SetPasswordScreen, SetupRequiredScreen, SplashScreen, UnconfiguredScreen,
+} from './auth/AuthScreens';
 import Layout from './components/Layout';
 import { ToastProvider } from './components/Toasts';
 import Overview from './pages/Overview';
@@ -32,6 +34,7 @@ function Gate() {
   if (status === 'recovery') return <SetPasswordScreen />;
   if (status === 'signed-out') return <LoginScreen />;
   if (status === 'forbidden') return <ForbiddenScreen />;
+  if (status === 'setup-required') return <SetupRequiredScreen />;
 
   return (
     <Routes>

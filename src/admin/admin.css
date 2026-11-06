@@ -66,6 +66,7 @@
 .auth-link:hover { text-decoration: underline; }
 .auth-msg { margin: 0; padding: 10px 14px; border-radius: 10px; font-size: .9rem; font-weight: 600; }
 .auth-msg-error { background: #FDECEC; color: #B42318; }
+.auth-inline-btn { display: block; margin-top: 8px; padding: 0; border: 0; background: none; color: inherit; font: inherit; font-weight: 800; text-decoration: underline; cursor: pointer; }
 .auth-msg-ok { background: var(--st-completed-bg); color: var(--st-completed-fg); }
 @keyframes bk-rise { from { opacity: 0; transform: translateY(10px); } }
 

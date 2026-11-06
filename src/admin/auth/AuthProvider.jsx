@@ -5,12 +5,12 @@ import { checkIsAdmin, resolveLoginEmail } from '../lib/api';
 const AuthContext = createContext(null);
 
 /**
- * status: 'loading' | 'signed-out' | 'recovery' | 'checking' | 'admin' | 'forbidden' | 'unconfigured'
+ * status: 'loading' | 'signed-out' | 'recovery' | 'checking' | 'admin' | 'forbidden' | 'setup-required' | 'unconfigured'
  */
 export function AuthProvider({ children }) {
   const [session, setSession] = useState(undefined);
   const [recovery, setRecovery] = useState(false);
-  const [admin, setAdmin] = useState(null); // null = unknown
+  const [admin, setAdmin] = useState(null); // null = unknown, 'setup' = database functions missing
 
   useEffect(() => {
     if (!supabase) return undefined;
@@ -32,7 +32,7 @@ export function AuthProvider({ children }) {
     setAdmin(null);
     checkIsAdmin()
       .then((ok) => !cancelled && setAdmin(Boolean(ok)))
-      .catch(() => !cancelled && setAdmin(false));
+      .catch((err) => !cancelled && setAdmin(err?.code === 'PGRST202' ? 'setup' : false));
     return () => { cancelled = true; };
   }, [userId]);
 
@@ -43,6 +43,7 @@ export function AuthProvider({ children }) {
     else if (recovery && session) status = 'recovery';
     else if (!session) status = 'signed-out';
     else if (admin === null) status = 'checking';
+    else if (admin === 'setup') status = 'setup-required';
     else status = admin ? 'admin' : 'forbidden';
 
     return {
@@ -50,12 +51,21 @@ export function AuthProvider({ children }) {
       user: session?.user ?? null,
       email: session?.user?.email?.toLowerCase() ?? '',
       name: session?.user?.user_metadata?.full_name?.trim() ?? '',
+      // Errors come back as { code, message, email } so the screen can say exactly what's wrong.
       signIn: async (login, password) => {
-        const email = await resolveLoginEmail(login).catch(() => null);
+        let email;
+        try {
+          email = await resolveLoginEmail(login);
+        } catch (err) {
+          return { error: { code: err?.code === 'PGRST202' ? 'setup_required' : 'lookup_failed', message: err?.message } };
+        }
         // Same message for an unknown username as for a wrong password.
-        if (!email) return { error: { message: 'Invalid login credentials' } };
-        return supabase.auth.signInWithPassword({ email, password });
+        if (!email) return { error: { code: 'invalid_credentials', message: 'Invalid login credentials' } };
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        return error ? { error: { code: error.code, message: error.message, email } } : { error: null };
       },
+      resendConfirmation: (email) =>
+        supabase.auth.resend({ type: 'signup', email, options: { emailRedirectTo: `${window.location.origin}/admin` } }),
       signOut: () => supabase.auth.signOut(),
       updateProfile: (fullName) => supabase.auth.updateUser({ data: { full_name: fullName.trim() } }),
       sendReset: async (login) => {

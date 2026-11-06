@@ -31,8 +31,21 @@ function Message({ tone = 'error', children }) {
   return <p className={`auth-msg auth-msg-${tone}`} role={tone === 'error' ? 'alert' : 'status'}>{children}</p>;
 }
 
+function loginErrorMessage(error) {
+  switch (error.code) {
+    case 'invalid_credentials':
+      return { tone: 'error', text: 'Wrong username or password.' };
+    case 'email_not_confirmed':
+      return { tone: 'error', text: `This account’s email isn’t confirmed yet. Open the link Supabase sent to ${error.email}, then sign in.`, resendTo: error.email };
+    case 'setup_required':
+      return { tone: 'error', text: 'The admin database isn’t set up yet. Run the two SQL files in supabase/migrations (Supabase → SQL Editor), then try again.' };
+    default:
+      return { tone: 'error', text: error.message || 'Couldn’t sign in. Please try again.' };
+  }
+}
+
 export function LoginScreen() {
-  const { signIn, sendReset } = useAuth();
+  const { signIn, sendReset, resendConfirmation } = useAuth();
   const [mode, setMode] = useState('signin'); // signin | reset
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
@@ -45,7 +58,7 @@ export function LoginScreen() {
     setMsg(null);
     if (mode === 'signin') {
       const { error } = await signIn(login, password);
-      if (error) setMsg({ tone: 'error', text: error.message === 'Invalid login credentials' ? 'Wrong username or password.' : error.message });
+      if (error) setMsg(loginErrorMessage(error));
     } else {
       const { error } = await sendReset(login);
       setMsg(error
@@ -80,7 +93,25 @@ export function LoginScreen() {
             <input type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} />
           </label>
         )}
-        {msg && <Message tone={msg.tone}>{msg.text}</Message>}
+        {msg && (
+          <Message tone={msg.tone}>
+            {msg.text}
+            {msg.resendTo && (
+              <button
+                type="button"
+                className="auth-inline-btn"
+                onClick={async () => {
+                  const { error } = await resendConfirmation(msg.resendTo);
+                  setMsg(error
+                    ? { tone: 'error', text: error.message }
+                    : { tone: 'ok', text: `New confirmation link sent to ${msg.resendTo}. Open it, then sign in here.` });
+                }}
+              >
+                Resend confirmation link
+              </button>
+            )}
+          </Message>
+        )}
         <button type="submit" className="btn btn-primary btn-block" disabled={busy}>
           {busy ? <span className="spinner" aria-hidden="true" /> : null}
           {mode === 'signin' ? 'Sign in' : 'Send reset link'}
@@ -134,6 +165,19 @@ export function ForbiddenScreen() {
   return (
     <AuthShell title="No access" subtitle={`${email} isn’t on the admin list. Ask an existing admin to add you in Settings.`}>
       <button type="button" className="btn btn-ghost btn-block" onClick={signOut}><Icon name="logout" /> Sign out</button>
+    </AuthShell>
+  );
+}
+
+export function SetupRequiredScreen() {
+  const { signOut } = useAuth();
+  return (
+    <AuthShell
+      title="Almost there"
+      subtitle="You’re signed in, but the admin database hasn’t been set up. In Supabase → SQL Editor, run supabase/migrations/…0001_bookings.sql and then …0002_admin.sql, and reload this page."
+    >
+      <button type="button" className="btn btn-primary btn-block" onClick={() => window.location.reload()}>Reload</button>
+      <button type="button" className="auth-link" onClick={signOut}>Sign out</button>
     </AuthShell>
   );
 }
