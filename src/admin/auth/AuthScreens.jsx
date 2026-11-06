@@ -33,12 +33,19 @@ function Message({ tone = 'error', children }) {
 
 function loginErrorMessage(error) {
   switch (error.code) {
+    case 'unknown_username':
+      return { tone: 'error', text: 'There’s no admin with that username. Check the spelling, or sign in with your email address instead.' };
     case 'invalid_credentials':
-      return { tone: 'error', text: 'Wrong username or password.' };
+      return {
+        tone: 'error',
+        text: error.byEmail
+          ? 'Wrong email or password.'
+          : 'That password isn’t right for this username. Passwords are case-sensitive, so check Caps Lock.',
+      };
     case 'email_not_confirmed':
       return { tone: 'error', text: `This account’s email isn’t confirmed yet. Open the link Supabase sent to ${error.email}, then sign in.`, resendTo: error.email };
     case 'setup_required':
-      return { tone: 'error', text: 'The admin database isn’t set up yet. Run the two SQL files in supabase/migrations (Supabase → SQL Editor), then try again.' };
+      return { tone: 'error', text: 'The admin database isn’t set up yet. Run the SQL files in supabase/migrations in order (Supabase → SQL Editor), then try again.' };
     default:
       return { tone: 'error', text: error.message || 'Couldn’t sign in. Please try again.' };
   }
@@ -49,6 +56,7 @@ export function LoginScreen() {
   const [mode, setMode] = useState('signin'); // signin | reset
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState(null);
 
@@ -90,7 +98,24 @@ export function LoginScreen() {
         {mode === 'signin' && (
           <label className="field">
             <span>Password</span>
-            <input type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} />
+            <span className="pw-field">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                autoComplete="current-password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <button
+                type="button"
+                className="pw-toggle"
+                aria-pressed={showPassword}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                onClick={() => setShowPassword((v) => !v)}
+              >
+                {showPassword ? 'Hide' : 'Show'}
+              </button>
+            </span>
           </label>
         )}
         {msg && (
@@ -174,7 +199,7 @@ export function SetupRequiredScreen() {
   return (
     <AuthShell
       title="Almost there"
-      subtitle="You’re signed in, but the admin database hasn’t been set up. In Supabase → SQL Editor, run supabase/migrations/…0001_bookings.sql and then …0002_admin.sql, and reload this page."
+      subtitle="You’re signed in, but the admin database hasn’t been set up. In Supabase → SQL Editor, run the files in supabase/migrations in order, then reload this page."
     >
       <button type="button" className="btn btn-primary btn-block" onClick={() => window.location.reload()}>Reload</button>
       <button type="button" className="auth-link" onClick={signOut}>Sign out</button>

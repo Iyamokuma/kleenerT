@@ -68,6 +68,15 @@
 .auth-msg-error { background: #FDECEC; color: #B42318; }
 .auth-inline-btn { display: block; margin-top: 8px; padding: 0; border: 0; background: none; color: inherit; font: inherit; font-weight: 800; text-decoration: underline; cursor: pointer; }
 .auth-msg-ok { background: var(--st-completed-bg); color: var(--st-completed-fg); }
+.field > .pw-field { position: relative; display: block; font-size: inherit; font-weight: inherit; color: inherit; }
+.pw-field input { padding-right: 72px; }
+.pw-toggle {
+  position: absolute; top: 50%; right: 6px; transform: translateY(-50%);
+  padding: 7px 12px; border: 0; border-radius: 8px; background: transparent;
+  color: var(--navy-700); font: inherit; font-size: .82rem; font-weight: 700; cursor: pointer;
+}
+.pw-toggle:hover { background: var(--sky-50); }
+.pw-toggle:focus-visible { outline: 2px solid var(--sky-500); outline-offset: 1px; }
 @keyframes bk-rise { from { opacity: 0; transform: translateY(10px); } }
 
 /* App shell -------------------------------------------------------------------- */

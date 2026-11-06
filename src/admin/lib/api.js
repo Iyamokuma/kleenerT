@@ -124,9 +124,16 @@ export async function removeAdmin(email) {
 }
 
 // Supabase Auth signs in by email; admins may type their username instead.
+// Mirrors admin_login_email(): ignore case and every kind of whitespace,
+// including invisible characters that come along when copying from chat apps.
+export function normaliseLogin(login) {
+  return String(login ?? '').replace(/[\s​-‍⁠﻿]/g, '').toLowerCase();
+}
+
 export async function resolveLoginEmail(login) {
-  const value = login.trim();
-  if (value.includes('@')) return value.toLowerCase();
+  const value = normaliseLogin(login);
+  if (!value) return null;
+  if (value.includes('@')) return value;
   return unwrap(await supabase.rpc('admin_login_email', { p_login: value }));
 }
 

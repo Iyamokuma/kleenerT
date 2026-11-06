@@ -59,10 +59,12 @@ export function AuthProvider({ children }) {
         } catch (err) {
           return { error: { code: err?.code === 'PGRST202' ? 'setup_required' : 'lookup_failed', message: err?.message } };
         }
-        // Same message for an unknown username as for a wrong password.
-        if (!email) return { error: { code: 'invalid_credentials', message: 'Invalid login credentials' } };
+        // Say which half is wrong: a mistyped username and a wrong password need different fixes.
+        if (!email) return { error: { code: 'unknown_username', message: 'No admin has that username' } };
         const { error } = await supabase.auth.signInWithPassword({ email, password });
-        return error ? { error: { code: error.code, message: error.message, email } } : { error: null };
+        return error
+          ? { error: { code: error.code, message: error.message, email, byEmail: login.includes('@') } }
+          : { error: null };
       },
       resendConfirmation: (email) =>
         supabase.auth.resend({ type: 'signup', email, options: { emailRedirectTo: `${window.location.origin}/admin` } }),

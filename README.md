@@ -44,6 +44,7 @@ Run the files in `supabase/migrations/` **in order** (Supabase → SQL Editor �
 | --- | --- |
 | `…0001_bookings.sql` | `bookings` table, row-level security, and the public `create_booking()` function the booking form calls. It validates every field server-side, rate-limits by phone number and returns a reference such as `KT-261105-4F2A`. |
 | `…0002_admin.sql` | Admin allow-list (`admin_users`), staff columns (assignee, confirmed date, quote), the `booking_events` activity log written by triggers, `admin_dashboard_stats()`, the `booking_customers` view and realtime on `bookings`. Seeds `booking.kleenertouch@gmail.com` as the first admin. |
+| `…0003_forgiving_login.sql` | Makes the username lookup ignore case and stray or invisible spaces, and accept the part of an admin's email before the @ as a username. |
 
 Visitors can't read, edit or delete bookings. The website's key can only call `create_booking()`. Signed-in users only see data if their **confirmed** email is on `admin_users`.
 
