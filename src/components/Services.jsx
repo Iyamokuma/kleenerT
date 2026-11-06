@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 import Icon from './Icon';
+import { BookLink } from './booking/BookingProvider';
 import SectionHead from './SectionHead';
 import { services } from '../data/content';
 
@@ -63,6 +64,9 @@ export default function Services() {
               <ul className="checklist cols-2">
                 {s.items.map((item) => <li key={item}>{item}</li>)}
               </ul>
+              <BookLink service={s.title} className="btn btn-primary panel-cta">
+                Book this service <Icon name="arrow" />
+              </BookLink>
             </div>
             <img className="panel-img" src={s.image.src} alt={s.image.alt} loading="lazy" />
           </div>

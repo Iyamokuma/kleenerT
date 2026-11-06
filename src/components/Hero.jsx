@@ -1,4 +1,5 @@
 import Icon from './Icon';
+import { BookLink } from './booking/BookingProvider';
 import Foam, { Bubbles } from './Foam';
 import { clients, company } from '../data/content';
 
@@ -42,14 +43,13 @@ export default function Hero() {
         <Bubbles items={heroBubbles} />
 
         <div className="container hero-inner">
-          <span className="eyebrow eyebrow-glass"><span className="dot" />Facility Management &amp; One-Stop Facility Solutions</span>
           <h1>Keep your space <span className="accent">spotless</span> and working.</h1>
           <p className="lead">
             {company.slogan} Professional cleaning, housekeeping, facility management and pest control for homes,
             offices and businesses across Nigeria.
           </p>
           <div className="hero-actions">
-            <a href="#book" className="btn btn-primary btn-lg">Book a service <Icon name="arrow" /></a>
+            <BookLink className="btn btn-primary btn-lg">Book a service <Icon name="arrow" /></BookLink>
             <a href="#services" className="btn btn-glass btn-lg">Our services</a>
           </div>
           <div className="hero-proof">

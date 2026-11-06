@@ -13,10 +13,11 @@ import People from './components/People';
 import Leadership from './components/Leadership';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
+import { BookingProvider } from './components/booking/BookingProvider';
 
 export default function App() {
   return (
-    <>
+    <BookingProvider>
       <a className="skip-link" href="#main">Skip to content</a>
       <Header />
       <main id="main">
@@ -35,6 +36,6 @@ export default function App() {
         <Contact />
       </main>
       <Footer />
-    </>
+    </BookingProvider>
   );
 }
