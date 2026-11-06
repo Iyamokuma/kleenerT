@@ -45,6 +45,7 @@ Run the files in `supabase/migrations/` **in order** (Supabase → SQL Editor �
 | `…0001_bookings.sql` | `bookings` table, row-level security, and the public `create_booking()` function the booking form calls. It validates every field server-side, rate-limits by phone number and returns a reference such as `KT-261105-4F2A`. |
 | `…0002_admin.sql` | Admin allow-list (`admin_users`), staff columns (assignee, confirmed date, quote), the `booking_events` activity log written by triggers, `admin_dashboard_stats()`, the `booking_customers` view and realtime on `bookings`. Seeds `booking.kleenertouch@gmail.com` as the first admin. |
 | `…0003_forgiving_login.sql` | Makes the username lookup ignore case and stray or invisible spaces, and accept the part of an admin's email before the @ as a username. |
+| `…0004_analytics_and_username.sql` | `admin_analytics(p_days, p_year)` for the overview (period figures with the previous period for comparison, pipeline from the activity log, time to first response, monthly outcomes, popular services, weekday × time-of-day demand) and `set_my_username()` so admins can change their own username. |
 
 Visitors can't read, edit or delete bookings. The website's key can only call `create_booking()`. Signed-in users only see data if their **confirmed** email is on `admin_users`.
 
@@ -54,7 +55,7 @@ Visitors can't read, edit or delete bookings. The website's key can only call `c
 2. **Authentication → URL Configuration**: set **Site URL** to the live domain and add `https://<your-domain>/admin` to **Redirect URLs** (used by "Forgot password").
 3. **Authentication → Users**: the first admin is `booking.kleenertouch@gmail.com`, username **`osasofkleener`**. If the account isn't listed, use **Add user → Create new user** with **Auto Confirm User** ticked.
 
-Admins sign in at `/admin` with their **username or email**. Usernames live in `admin_users.username` and can be set when adding an admin in Settings.
+Admins sign in at `/admin` with their **username or email**. Usernames live in `admin_users.username`; they're set when adding an admin, and each admin can change their own in Settings.
 
 ## Booking flow
 
@@ -68,14 +69,16 @@ Sign in with an admin login to manage everything behind the booking form:
 
 | Page | What staff can do |
 | --- | --- |
-| **Overview** | New requests, jobs in the next 7 days, bookings this month vs last, completed revenue; 30-day bookings chart; bookings by service; who needs a first call; what's coming up |
+| **Overview** | Pick 7 days / 30 days / 90 days / 12 months: requests won (conversion), revenue against the previous period, requests received, average first response, share booked online, cancellation rate; monthly bookings stacked by outcome for any year (chart or table); popular services; pipeline funnel; busiest weekday × time of day; who needs a first call; what's coming up |
 | **Bookings** | Filter by status and service, search name / phone / reference / address, sort, paginate, export CSV, log phone & WhatsApp bookings |
 | **Booking drawer** | Call, WhatsApp or email the customer; move it through *new → contacted → confirmed → completed* (or cancel); set confirmed date & time, assignee and quote; internal notes; full activity history; delete |
 | **Schedule** | Two-week agenda by service date, with a list of open bookings that are past their date |
 | **Customers** | Everyone grouped by phone number with booking count, completed jobs and lifetime value |
-| **Settings** | Your name, change password, add / remove admins, export all bookings |
+| **Settings** | Change your username, change your password (current password required), add / remove admins, export all bookings |
 
 New website bookings appear instantly (Supabase Realtime) with a notification, and the tab title shows how many are waiting. The dashboard is a separate bundle, so site visitors never download it.
+
+UI libraries: [Motion](https://motion.dev) for animation (respects the device's reduce-motion setting), [NumberFlow](https://number-flow.barvian.me) for animated figures and [Lucide](https://lucide.dev) icons. Chart colours were checked for colour-blind separation; every chart also has a table or text equivalent.
 
 ## Project layout
 

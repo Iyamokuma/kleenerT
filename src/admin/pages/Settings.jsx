@@ -1,67 +1,159 @@
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { AtSign, ExternalLink, Eye, EyeOff, LogOut } from 'lucide-react';
 import Icon from '../../components/Icon';
 import { useAuth } from '../auth/AuthProvider';
-import { addAdmin, downloadCsv, fetchAdmins, fetchAllBookings, removeAdmin } from '../lib/api';
+import { addAdmin, downloadCsv, fetchAdmins, fetchAllBookings, removeAdmin, setMyUsername } from '../lib/api';
 import { formatDay, formatNumber, todayISO } from '../lib/format';
 import { useToast } from '../components/Toasts';
+import { useMyUsername } from '../components/Layout';
 import { Avatar, Card, ConfirmDialog, ErrorNote, PageHeader, Skeleton } from '../components/ui';
 
-function ProfileCard() {
-  const { name, updateProfile } = useAuth();
-  const toast = useToast();
-  const [value, setValue] = useState(name);
-  const [busy, setBusy] = useState(false);
-  const onSubmit = async (e) => {
-    e.preventDefault();
-    setBusy(true);
-    const { error } = await updateProfile(value);
-    setBusy(false);
-    toast(error ? { tone: 'error', title: 'Couldn’t save', body: error.message } : 'Name saved');
-  };
+const USERNAME_RE = /^[a-z0-9._-]{3,32}$/;
+
+function PasswordInput({ label, value, onChange, autoComplete, hint }) {
+  const [show, setShow] = useState(false);
   return (
-    <Card title="Your profile">
-      <form className="inline-form" onSubmit={onSubmit}>
-        <input value={value} onChange={(e) => setValue(e.target.value)} maxLength={80} placeholder="Your full name" aria-label="Your full name" />
-        <button type="submit" className="btn btn-primary btn-sm" disabled={busy || value.trim() === name}>Save</button>
+    <label className="field">
+      <span>{label}</span>
+      <span className="pw-field">
+        <input type={show ? 'text' : 'password'} autoComplete={autoComplete} value={value} onChange={(e) => onChange(e.target.value)} />
+        <button type="button" className="pw-toggle" aria-pressed={show} aria-label={show ? `Hide ${label.toLowerCase()}` : `Show ${label.toLowerCase()}`} onClick={() => setShow((v) => !v)}>
+          {show ? <EyeOff aria-hidden="true" strokeWidth={1.8} /> : <Eye aria-hidden="true" strokeWidth={1.8} />}
+        </button>
+      </span>
+      {hint}
+    </label>
+  );
+}
+
+function strength(pw) {
+  if (!pw) return { score: 0, label: '' };
+  let score = 0;
+  if (pw.length >= 8) score += 1;
+  if (pw.length >= 12) score += 1;
+  if (/[a-z]/.test(pw) && /[A-Z]/.test(pw)) score += 1;
+  if (/\d/.test(pw) && /[^A-Za-z0-9]/.test(pw)) score += 1;
+  if (pw.length < 8) score = Math.min(score, 1);
+  return { score, label: ['Too short', 'Weak', 'Fair', 'Good', 'Strong'][score] };
+}
+
+function AccountCard() {
+  const { email, signOut } = useAuth();
+  const queryClient = useQueryClient();
+  const toast = useToast();
+  const current = useMyUsername();
+  const [value, setValue] = useState(null); // null = untouched, show the saved username
+  const draft = value ?? current;
+  const cleaned = draft.replace(/\s/g, '').toLowerCase();
+  const valid = USERNAME_RE.test(cleaned);
+
+  const save = useMutation({
+    mutationFn: () => setMyUsername(cleaned),
+    onSuccess: (saved) => {
+      toast({ title: 'Username updated', body: `Sign in with “${saved}” or your email from now on.` });
+      setValue(null);
+      queryClient.invalidateQueries({ queryKey: ['admins'] });
+    },
+    onError: (err) => toast({ tone: 'error', title: 'Couldn’t change username', body: err.message }),
+  });
+
+  return (
+    <Card title="Your account">
+      <div className="account-head">
+        <span className="adm-me-avatar adm-me-avatar-lg" aria-hidden="true">A</span>
+        <div>
+          <strong>Admin</strong>
+          <small>{email}</small>
+        </div>
+      </div>
+      <form className="adm-form" onSubmit={(e) => { e.preventDefault(); if (valid && cleaned !== current) save.mutate(); }}>
+        <label className="field">
+          <span>Username</span>
+          <span className="at-field">
+            <AtSign aria-hidden="true" strokeWidth={1.8} />
+            <input
+              value={draft}
+              onChange={(e) => setValue(e.target.value)}
+              autoComplete="username"
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck={false}
+              maxLength={32}
+              aria-invalid={draft !== '' && !valid}
+              aria-describedby="username-help"
+            />
+          </span>
+          <small id="username-help" className={`field-help${draft !== '' && !valid ? ' is-error' : ''}`}>
+            {draft !== '' && !valid ? '3–32 letters, numbers, dots, dashes or underscores.' : 'Use this or your email to sign in.'}
+          </small>
+        </label>
+        <div className="form-actions">
+          <button type="submit" className="btn btn-primary btn-sm" disabled={save.isPending || !valid || cleaned === current}>
+            {save.isPending && <span className="spinner" aria-hidden="true" />} Save username
+          </button>
+        </div>
       </form>
-      <p className="muted card-sub card-sub-after">Shown in the greeting and sidebar.</p>
+      <div className="account-links">
+        <a href="/" target="_blank" rel="noopener noreferrer" className="btn btn-ghost btn-sm"><ExternalLink aria-hidden="true" strokeWidth={1.8} /> View website</a>
+        <button type="button" className="btn btn-ghost btn-sm" onClick={signOut}><LogOut aria-hidden="true" strokeWidth={1.8} /> Sign out</button>
+      </div>
     </Card>
   );
 }
 
 function PasswordCard() {
-  const { updatePassword } = useAuth();
+  const { changePassword } = useAuth();
   const toast = useToast();
+  const [currentPw, setCurrentPw] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
+  const meter = strength(password);
 
   const onSubmit = async (e) => {
     e.preventDefault();
-    if (password.length < 8) return setError('Use at least 8 characters.');
-    if (password !== confirm) return setError('The passwords don’t match.');
+    if (!currentPw) return setError('Enter your current password.');
+    if (password.length < 8) return setError('Use at least 8 characters for the new password.');
+    if (password !== confirm) return setError('The new passwords don’t match.');
+    if (password === currentPw) return setError('The new password must be different from the current one.');
+    setError('');
     setBusy(true);
-    const { error: err } = await updatePassword(password);
+    const { error: err } = await changePassword(currentPw, password);
     setBusy(false);
     if (err) return setError(err.message);
+    setCurrentPw('');
     setPassword('');
     setConfirm('');
     setError('');
-    toast('Password updated');
+    toast({ title: 'Password changed', body: 'Use the new password next time you sign in.' });
     return undefined;
   };
 
   return (
     <Card title="Change password">
       <form className="adm-form" onSubmit={onSubmit}>
-        <div className="field-row">
-          <label className="field"><span>New password</span><input type="password" autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} /></label>
-          <label className="field"><span>Confirm</span><input type="password" autoComplete="new-password" value={confirm} onChange={(e) => setConfirm(e.target.value)} /></label>
-        </div>
+        <PasswordInput label="Current password" value={currentPw} onChange={setCurrentPw} autoComplete="current-password" />
+        <PasswordInput
+          label="New password"
+          value={password}
+          onChange={setPassword}
+          autoComplete="new-password"
+          hint={password && (
+            <span className="pw-meter" data-score={meter.score}>
+              <span className="pw-meter-bars" aria-hidden="true">{[1, 2, 3, 4].map((i) => <i key={i} />)}</span>
+              <span className="pw-meter-label">{meter.label}</span>
+            </span>
+          )}
+        />
+        <PasswordInput label="Confirm new password" value={confirm} onChange={setConfirm} autoComplete="new-password" />
         {error && <p className="error-note" role="alert">{error}</p>}
-        <div><button type="submit" className="btn btn-primary btn-sm" disabled={busy || !password}>Update password</button></div>
+        <div className="form-actions">
+          <button type="submit" className="btn btn-primary btn-sm" disabled={busy || !currentPw || !password || !confirm}>
+            {busy && <span className="spinner" aria-hidden="true" />} Change password
+          </button>
+        </div>
       </form>
     </Card>
   );
@@ -172,12 +264,14 @@ export default function Settings() {
   const { email } = useAuth();
   return (
     <>
-      <PageHeader title="Settings" subtitle={`Signed in as ${email}`} />
+      <PageHeader title="Settings" subtitle={`Signed in as Admin · ${email}`} />
       <div className="settings-grid">
-        <AdminsCard />
         <div className="settings-col">
-          <ProfileCard />
+          <AccountCard />
           <PasswordCard />
+        </div>
+        <div className="settings-col">
+          <AdminsCard />
           <DataCard />
         </div>
       </div>

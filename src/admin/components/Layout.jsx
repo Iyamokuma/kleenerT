@@ -1,25 +1,27 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { NavLink, Outlet, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, NavLink, Outlet, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import Icon from '../../components/Icon';
+import { motion } from 'motion/react';
+import { CalendarDays, ExternalLink, Inbox, LayoutGrid, LogOut, Plus, Search, Settings, Users } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../auth/AuthProvider';
-import { fetchStats } from '../lib/api';
+import { fetchAdmins, fetchStats } from '../lib/api';
 import BookingDrawer from './BookingDrawer';
 import NewBookingDialog from './NewBookingDialog';
 import { useToast } from './Toasts';
-import { Avatar } from './ui';
 
 const AdminContext = createContext(null);
 export const useAdmin = () => useContext(AdminContext);
 
 const NAV = [
-  { to: '/', label: 'Overview', icon: 'grid', end: true },
-  { to: '/bookings', label: 'Bookings', icon: 'list', badge: true },
-  { to: '/schedule', label: 'Schedule', icon: 'calendar' },
-  { to: '/customers', label: 'Customers', icon: 'users' },
-  { to: '/settings', label: 'Settings', icon: 'settings' },
+  { to: '/', label: 'Overview', Icon: LayoutGrid, end: true },
+  { to: '/bookings', label: 'Bookings', Icon: Inbox, badge: true },
+  { to: '/schedule', label: 'Schedule', Icon: CalendarDays },
+  { to: '/customers', label: 'Customers', Icon: Users },
+  { to: '/settings', label: 'Settings', Icon: Settings },
 ];
+
+const SPRING = { type: 'spring', stiffness: 520, damping: 38 };
 
 function useRealtimeBookings(onNewBooking) {
   const queryClient = useQueryClient();
@@ -38,15 +40,38 @@ function useRealtimeBookings(onNewBooking) {
   }, [queryClient]);
 }
 
+/** The signed-in admin's username, for the account chip. */
+export function useMyUsername() {
+  const { email } = useAuth();
+  const { data } = useQuery({ queryKey: ['admins'], queryFn: fetchAdmins });
+  return data?.find((a) => a.email === email)?.username ?? '';
+}
+
+function NavItem({ item, count, layoutId, withLabel }) {
+  const { Icon } = item;
+  return (
+    <NavLink to={item.to} end={item.end} className={({ isActive }) => `nav-item${isActive ? ' is-active' : ''}`} aria-label={withLabel ? undefined : item.label}>
+      {({ isActive }) => (
+        <>
+          {isActive && <motion.span layoutId={layoutId} className="nav-item-bg" transition={SPRING} />}
+          <Icon className="nav-item-icon" strokeWidth={1.8} aria-hidden="true" />
+          {item.badge && count > 0 && <span className="nav-item-badge" aria-label={`${count} new`}>{count > 99 ? '99+' : count}</span>}
+          {withLabel ? <span className="nav-item-label">{item.label}</span> : <span className="nav-item-tip" aria-hidden="true">{item.label}</span>}
+        </>
+      )}
+    </NavLink>
+  );
+}
+
 export default function Layout() {
-  const { email, name, signOut } = useAuth();
+  const { signOut } = useAuth();
   const toast = useToast();
   const navigate = useNavigate();
   const location = useLocation();
   const [params, setParams] = useSearchParams();
-  const [navOpen, setNavOpen] = useState(false);
   const [newOpen, setNewOpen] = useState(false);
   const [search, setSearch] = useState('');
+  const username = useMyUsername();
 
   const { data: stats } = useQuery({ queryKey: ['stats'], queryFn: fetchStats });
   const newCount = stats?.status_counts?.new ?? 0;
@@ -65,12 +90,12 @@ export default function Layout() {
     });
   });
 
-  useEffect(() => setNavOpen(false), [location.pathname]);
   useEffect(() => {
     document.title = `${newCount ? `(${newCount}) ` : ''}Kleener Touch · Admin`;
   }, [newCount]);
 
   const actions = useMemo(() => ({ openBooking, openNewBooking: () => setNewOpen(true) }), [openBooking]);
+  const onOverview = location.pathname === '/';
 
   const onSearch = (e) => {
     e.preventDefault();
@@ -81,40 +106,33 @@ export default function Layout() {
 
   return (
     <AdminContext.Provider value={actions}>
-      <div className={`adm ${navOpen ? 'nav-open' : ''}`.trim()}>
-        <aside className="adm-side">
-          <a href="/admin" className="adm-brand">
-            <img src="/images/logo.png" alt="" width="38" height="43" />
-            <span><strong>Kleener Touch</strong><small>Operations</small></span>
-          </a>
-          <nav className="adm-nav" aria-label="Admin">
-            {NAV.map((item) => (
-              <NavLink key={item.to} to={item.to} end={item.end} className={({ isActive }) => (isActive ? 'is-active' : undefined)}>
-                <Icon name={item.icon} />
-                <span>{item.label}</span>
-                {item.badge && newCount > 0 && <span className="nav-badge" aria-label={`${newCount} new`}>{newCount}</span>}
-              </NavLink>
-            ))}
+      <div className="adm">
+        <aside className="rail">
+          <Link to="/" className="rail-logo" aria-label="Kleener Touch admin home">
+            <img src="/images/logo.png" alt="" width="40" height="46" />
+          </Link>
+          <nav className="rail-nav" aria-label="Admin">
+            {NAV.map((item) => <NavItem key={item.to} item={item} count={newCount} layoutId="rail-active" />)}
           </nav>
-          <div className="adm-side-foot">
-            <a href="/" className="adm-side-link" target="_blank" rel="noopener noreferrer"><Icon name="external" /> View website</a>
-            <div className="adm-user">
-              <Avatar name={name || email.split('@')[0].replace(/[._-]/g, ' ')} size={34} />
-              <span className="adm-user-text" title={email}>
-                {name && <strong>{name}</strong>}
-                <small>{email}</small>
-              </span>
-              <button type="button" className="icon-btn icon-btn-dark" onClick={signOut} aria-label="Sign out" title="Sign out"><Icon name="logout" /></button>
-            </div>
+          <div className="rail-foot">
+            <a href="/" className="nav-item" target="_blank" rel="noopener noreferrer" aria-label="View website (opens in a new tab)">
+              <ExternalLink className="nav-item-icon" strokeWidth={1.8} aria-hidden="true" />
+              <span className="nav-item-tip" aria-hidden="true">View website</span>
+            </a>
+            <button type="button" className="nav-item" onClick={signOut} aria-label="Sign out">
+              <LogOut className="nav-item-icon" strokeWidth={1.8} aria-hidden="true" />
+              <span className="nav-item-tip" aria-hidden="true">Sign out</span>
+            </button>
           </div>
         </aside>
-        <button type="button" className="adm-scrim" aria-label="Close menu" onClick={() => setNavOpen(false)} tabIndex={navOpen ? 0 : -1} />
 
         <div className="adm-main">
           <header className="adm-top">
-            <button type="button" className="icon-btn adm-menu" onClick={() => setNavOpen(true)} aria-label="Open menu"><Icon name="menu" /></button>
+            <Link to="/" className="adm-top-logo" aria-label="Overview">
+              <img src="/images/logo.png" alt="" width="32" height="37" />
+            </Link>
             <form className="adm-search" onSubmit={onSearch} role="search">
-              <Icon name="search" />
+              <Search aria-hidden="true" strokeWidth={1.8} />
               <input
                 type="search"
                 placeholder="Search name, phone, reference or address…"
@@ -123,12 +141,36 @@ export default function Layout() {
                 aria-label="Search bookings"
               />
             </form>
-            <button type="button" className="btn btn-primary btn-sm" onClick={() => setNewOpen(true)}><Icon name="plus" /> <span className="hide-sm">New booking</span></button>
+            {!onOverview && (
+              <button type="button" className="pill pill-dark" onClick={() => setNewOpen(true)}>
+                <Plus aria-hidden="true" strokeWidth={2} /> <span className="hide-sm">New booking</span>
+              </button>
+            )}
+            <Link to="/settings" className="adm-me" aria-label={`Admin account${username ? ` @${username}` : ''}`}>
+              <span className="adm-me-avatar" aria-hidden="true">A</span>
+              <span className="adm-me-text">
+                <strong>Admin</strong>
+                {username && <small>@{username}</small>}
+              </span>
+            </Link>
           </header>
+
           <main className="adm-content" id="main">
-            <Outlet />
+            <motion.div
+              key={location.pathname}
+              className="page"
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, ease: [0.22, 0.61, 0.36, 1] }}
+            >
+              <Outlet />
+            </motion.div>
           </main>
         </div>
+
+        <nav className="tabbar" aria-label="Admin">
+          {NAV.map((item) => <NavItem key={item.to} item={item} count={newCount} layoutId="tab-active" withLabel />)}
+        </nav>
       </div>
 
       <BookingDrawer id={bookingId} onClose={closeBooking} />

@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { QueryClient, QueryClientProvider, useQueryClient } from '@tanstack/react-query';
+import { MotionConfig } from 'motion/react';
 import { AuthProvider, useAuth } from './auth/AuthProvider';
 import {
   ForbiddenScreen, LoginScreen, SetPasswordScreen, SetupRequiredScreen, SplashScreen, UnconfiguredScreen,
@@ -53,6 +54,8 @@ function Gate() {
 export default function AdminApp() {
   return (
     <QueryClientProvider client={queryClient}>
+      {/* Animations follow the device's "reduce motion" setting. */}
+      <MotionConfig reducedMotion="user">
       <BrowserRouter basename="/admin" future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <AuthProvider>
           <ToastProvider>
@@ -60,6 +63,7 @@ export default function AdminApp() {
           </ToastProvider>
         </AuthProvider>
       </BrowserRouter>
+      </MotionConfig>
     </QueryClientProvider>
   );
 }

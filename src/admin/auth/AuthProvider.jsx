@@ -76,6 +76,20 @@ export function AuthProvider({ children }) {
         if (!email) return { error: null };
         return supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/admin` });
       },
+      // Settings → Change password: prove the current password first, so an unattended
+      // signed-in browser can't be used to take over the account.
+      changePassword: async (currentPassword, nextPassword) => {
+        const email = session?.user?.email;
+        const check = await supabase.auth.signInWithPassword({ email, password: currentPassword });
+        if (check.error) {
+          return { error: { code: 'wrong_current', message: 'Your current password isn’t right.' } };
+        }
+        const { error } = await supabase.auth.updateUser({ password: nextPassword });
+        if (!error) return { error: null };
+        if (error.code === 'same_password') return { error: { code: error.code, message: 'Choose a password you haven’t used for this account.' } };
+        if (error.code === 'weak_password') return { error: { code: error.code, message: 'That password is too weak. Use at least 8 characters with a mix of letters and numbers.' } };
+        return { error: { code: error.code, message: error.message } };
+      },
       updatePassword: async (password) => {
         const res = await supabase.auth.updateUser({ password });
         if (!res.error) setRecovery(false);

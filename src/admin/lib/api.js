@@ -78,6 +78,11 @@ export async function fetchStats() {
   return unwrap(await supabase.rpc('admin_dashboard_stats'));
 }
 
+/** Everything the overview charts need, for the last `days` days and calendar `year`. */
+export async function fetchAnalytics({ days, year }) {
+  return unwrap(await supabase.rpc('admin_analytics', { p_days: days, p_year: year ?? null }));
+}
+
 export async function fetchSchedule(fromISO, toISO) {
   return unwrap(
     await supabase
@@ -109,6 +114,11 @@ export async function fetchCustomers({ q = '' }) {
 
 export async function fetchAdmins() {
   return unwrap(await supabase.from('admin_users').select('*').order('added_at'));
+}
+
+/** Changes the signed-in admin's own username; returns the cleaned value. */
+export async function setMyUsername(username) {
+  return unwrap(await supabase.rpc('set_my_username', { p_username: username }));
 }
 
 export async function addAdmin({ email, username }, addedBy) {
