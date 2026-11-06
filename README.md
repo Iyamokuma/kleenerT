@@ -25,7 +25,7 @@ npm run dev
 
 `VITE_` prefixes work too. Both values are public by design: the database's row-level security decides what they can do. **Never** put the `service_role` / secret key in this project.
 
-Production builds read them from the committed `.env.production`, so a deploy works without extra setup. Values set in Vercel's dashboard take priority.
+Production builds read `VITE_SUPABASE_URL` / `VITE_SUPABASE_PUBLISHABLE_KEY` from the committed `.env.production`. The code checks `VITE_` names before `NEXT_PUBLIC_` ones, so this file pins the site to project `rbcuvmqariirwqaczuey` even if Vercel has other `NEXT_PUBLIC_SUPABASE_*` values. To switch projects, edit this file (or set `VITE_` variables in Vercel).
 
 ## Deploy on Vercel
 
