@@ -1,4 +1,4 @@
-import BookingForm from './BookingForm';
+import { BookLink } from './booking/BookingProvider';
 import Icon from './Icon';
 import { company } from '../data/content';
 
@@ -30,7 +30,18 @@ export default function Contact() {
           </div>
         </div>
 
-        <BookingForm />
+        <div className="book-card">
+          <span className="book-card-icon"><Icon name="calendar" /></span>
+          <h3>Book in under a minute</h3>
+          <p>Pick a service, choose a date and leave your number. We’ll call to confirm the details.</p>
+          <ol className="book-card-steps">
+            <li><span>1</span>Choose the service you need</li>
+            <li><span>2</span>Pick a date, time and location</li>
+            <li><span>3</span>We call you to confirm</li>
+          </ol>
+          <BookLink className="btn btn-primary btn-lg btn-block">Book a service <Icon name="arrow" /></BookLink>
+          <p className="form-note">Or call <a href={company.phoneHref}>{company.phone}</a></p>
+        </div>
       </div>
     </section>
   );

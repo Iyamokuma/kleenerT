@@ -1,6 +1,7 @@
 import Icon from './Icon';
 import Foam, { Bubbles } from './Foam';
 import { Brand } from './Header';
+import { BookLink } from './booking/BookingProvider';
 import { company, navLinks, services } from '../data/content';
 
 const ctaBubbles = [[6, 58, 30, .4], [12, 70, 12, 1.4], [88, 54, 40, 0], [94, 64, 14, 1.8]];
@@ -19,7 +20,7 @@ function CallToAction() {
             we organize while at it.
           </p>
           <div className="cta-actions">
-            <a href="#book" className="btn btn-primary btn-lg"><Icon name="calendar" /> Book a service</a>
+            <BookLink className="btn btn-primary btn-lg"><Icon name="calendar" /> Book a service</BookLink>
             <a href={company.phoneHref} className="btn btn-glass btn-lg"><Icon name="phone" /> Call {company.phone}</a>
           </div>
         </div>
@@ -54,7 +55,7 @@ export default function Footer() {
             {navLinks.filter((l) => l.href !== '#services').map(({ href, label }) => (
               <li key={href}><a href={href}>{label}</a></li>
             ))}
-            <li><a href="#book">Book a service</a></li>
+            <li><BookLink>Book a service</BookLink></li>
           </ul>
         </div>
 

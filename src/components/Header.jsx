@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import Icon from './Icon';
+import { BookLink } from './booking/BookingProvider';
 import { navLinks } from '../data/content';
 import { useActiveSection } from '../hooks/useActiveSection';
 
@@ -49,7 +50,7 @@ export default function Header() {
               {label}
             </a>
           ))}
-          <a href="#book" onClick={close} className="btn btn-primary btn-sm nav-cta">Book a service</a>
+          <BookLink onClick={close} className="btn btn-primary btn-sm nav-cta">Book a service</BookLink>
         </nav>
 
         <button

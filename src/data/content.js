@@ -56,6 +56,7 @@ export const services = [
   {
     id: 'cleaning',
     tab: 'Cleaning',
+    blurb: 'Homes, offices, deep & post-construction',
     icon: 'sparkle',
     title: 'Professional Cleaning Services',
     intro:
@@ -70,6 +71,7 @@ export const services = [
   {
     id: 'janitorial',
     tab: 'Janitorial & Housekeeping',
+    blurb: 'Recruit, deploy & supervise staff',
     icon: 'users',
     title: 'Janitorial & Housekeeping Outsourcing',
     intro:
@@ -83,6 +85,7 @@ export const services = [
   {
     id: 'facility',
     tab: 'Facility Management',
+    blurb: 'Maintenance, repairs & operations',
     icon: 'building',
     title: 'Facility Management',
     intro: 'Keeping buildings and facilities functional, safe, organized and properly maintained. Our goal is simple: Keep It Working.',
@@ -96,6 +99,7 @@ export const services = [
   {
     id: 'pest',
     tab: 'Pest Control',
+    blurb: 'Fumigation & scheduled treatments',
     icon: 'shield',
     title: 'Pest Control & Fumigation',
     intro: 'Professional pest management solutions for residential, commercial and hospitality environments.',
@@ -108,6 +112,7 @@ export const services = [
   {
     id: 'supplies',
     tab: 'Equipment & Supplies',
+    blurb: 'Chemicals, tools & equipment',
     icon: 'box',
     title: 'Cleaning Equipment & Supplies',
     intro:
@@ -208,6 +213,10 @@ export const bookingOptions = {
     'Home / apartment', 'Office', 'Hotel / hospitality', 'Restaurant / café', 'Salon / spa',
     'Retail store', 'Estate / building', 'Construction site', 'Other',
   ],
-  timeWindows: ['Morning', 'Afternoon', 'Flexible'],
+  timeWindows: [
+    { value: 'Morning', hint: 'Before 12pm' },
+    { value: 'Afternoon', hint: '12pm – 5pm' },
+    { value: 'Flexible', hint: 'Any time' },
+  ],
   frequencies: ['One-time', 'Weekly', 'Every two weeks', 'Monthly', 'Ongoing contract'],
 };

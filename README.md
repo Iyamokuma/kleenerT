@@ -34,6 +34,22 @@ npm run dev
 
 `vercel.json` adds SPA rewrites, long-lived caching for hashed assets, basic security headers and `noindex` on `/admin`.
 
+## Database (Supabase)
+
+Run the files in `supabase/migrations/` **in order** (Supabase → SQL Editor → New query → paste → Run).
+
+| Migration | What it sets up |
+| --- | --- |
+| `…0001_bookings.sql` | `bookings` table, row-level security, and the public `create_booking()` function the booking form calls. It validates every field server-side, rate-limits by phone number and returns a reference such as `KT-261105-4F2A`. |
+
+Visitors can't read, edit or delete bookings. The website's key can only call `create_booking()`.
+
+## Booking flow
+
+Every "Book a service" button opens an animated, three-step modal (`src/components/booking/`):
+**service → date, time & address → contact details → confirmation with reference**.
+Any URL ending in `/#book` opens it directly. If Supabase isn't configured, the form falls back to a pre-filled email.
+
 ## Project layout
 
 ```
