@@ -20,14 +20,20 @@ export const navLinks = [
   { href: '#services', label: 'Services' },
   { href: '#approach', label: 'Approach' },
   { href: '#clients', label: 'Clients' },
-  { href: '#leadership', label: 'Leadership' },
+  { href: '#contact', label: 'Contact' },
 ];
 
-export const stats = [
-  { value: 2024, label: 'Full operations commenced', from: 2000 },
-  { value: 20, suffix: '+', label: 'Permanent staff' },
-  { value: 10, suffix: '+', label: 'Contract staff' },
-  { value: 98, suffix: '%+', label: 'Customer retention' },
+export const hero = {
+  headline: ['Clean Spaces.', 'Efficient Facilities.', 'Reliable People.'],
+  lead:
+    'Kleener Touch Facility Management Limited delivers professional cleaning, facility management, janitorial outsourcing, housekeeping and pest control solutions for residential, commercial and corporate environments.',
+  sub: 'We combine skilled people, structured processes and quality supervision to keep your spaces clean, organized and functioning efficiently.',
+};
+
+export const highlights = [
+  { label: 'Trained personnel', value: 30, suffix: '+' },
+  { label: 'Client retention', value: 98, suffix: '%' },
+  { label: 'Operations since', value: 2024, from: 2000 },
 ];
 
 export const milestones = [
@@ -45,93 +51,110 @@ export const mission =
 export const values = [
   { title: 'Professionalism', text: 'High standards in how we communicate, work and deliver.' },
   { title: 'Integrity', text: 'Trust is the foundation of every client and professional relationship.' },
-  { title: 'Accountability', text: 'We own our commitments and keep improving our delivery.' },
+  { title: 'Accountability', text: 'We take ownership of our responsibilities and address service concerns promptly.' },
   { title: 'Customer Focus', text: 'We listen, respond and solve practical needs.' },
-  { title: 'Fairness', text: 'Clients and skilled professionals deserve fair, respectful treatment.' },
-  { title: 'Reliability', text: 'Facility services are essential — we aim to be dependable.' },
+  { title: 'Fairness', text: 'We maintain respectful working relationships and honour agreed compensation.' },
+  { title: 'Reliability', text: 'We understand that our clients depend on consistent service delivery.' },
   { title: 'Excellence', text: 'Better people, processes and standards for better outcomes.' },
 ];
 
 export const services = [
   {
     id: 'cleaning',
+    letter: 'A',
     tab: 'Cleaning',
     blurb: 'Homes, offices, deep & post-construction',
     icon: 'sparkle',
     title: 'Professional Cleaning Services',
     intro:
-      'Cleaning solutions designed to maintain clean, healthy, organized and presentable environments. Our approach goes beyond simply removing dirt — we don’t just clean, we organize while at it.',
+      'Cleaning solutions designed to maintain clean, healthy, organized and presentable environments. We don’t just clean, we organize while at it.',
     items: [
-      'Residential cleaning', 'Office & commercial cleaning', 'Deep cleaning', 'Move-in & move-out cleaning',
-      'Post-construction cleaning', 'Regular cleaning', 'Subscription cleaning', 'Upholstery cleaning',
-      'Couch & mattress cleaning', 'Rug & carpet cleaning', 'Floor & tile cleaning', 'Specialized cleaning',
+      'Residential cleaning', 'Office and commercial cleaning', 'Post-construction cleaning', 'Deep cleaning',
+      'Upholstery and mattress cleaning', 'Rug and carpet cleaning', 'Move-in and move-out cleaning',
     ],
-    image: { src: '/images/bedroom-finish.jpg', alt: 'Freshly cleaned and organized bedroom' },
+    image: { src: '/images/bathroom-clean.jpg', alt: 'Kleener Touch cleaner wiping down a bathtub', position: '50% 40%' },
   },
   {
     id: 'janitorial',
+    letter: 'B',
     tab: 'Janitorial & Housekeeping',
     blurb: 'Recruit, deploy & supervise staff',
     icon: 'users',
-    title: 'Janitorial & Housekeeping Outsourcing',
+    title: 'Janitorial & Housekeeping Services',
     intro:
-      'We help organizations and property owners recruit, deploy and manage reliable janitors and housekeepers — so you can focus on your core activities while we manage day-to-day workforce requirements.',
+      'We recruit, train, deploy and supervise reliable janitors and housekeepers, so you can focus on your core activities while we manage the day-to-day workforce.',
     items: [
-      'Janitor recruitment & deployment', 'Housekeeper recruitment & deployment', 'Staff replacement',
-      'Staff supervision', 'Attendance & performance monitoring', 'Training & onboarding', 'Quality control',
+      'Janitorial outsourcing', 'Office janitorial management', 'Residential housekeeping', 'Hotel and hospitality housekeeping',
+      'Full-time and part-time housekeeping', 'Janitorial staff recruitment and training',
     ],
-    image: { src: '/images/cleaning-mop.jpg', alt: 'Kleener Touch janitor mopping a floor' },
+    image: { src: '/images/room-housekeeping.jpg', alt: 'Kleener Touch housekeeper cleaning a bedroom window with the furniture covered', position: '50% 22%' },
   },
   {
     id: 'facility',
+    letter: 'C',
     tab: 'Facility Management',
-    blurb: 'Maintenance, repairs & operations',
+    blurb: 'Maintenance, repairs & supervision',
     icon: 'building',
-    title: 'Facility Management',
+    title: 'Facility Management Services',
     intro: 'Keeping buildings and facilities functional, safe, organized and properly maintained. Our goal is simple: Keep It Working.',
     items: [
-      'Facility operations management', 'Facility & staff management', 'Preventive maintenance coordination',
-      'Corrective maintenance coordination', 'Plumbing services', 'Electrical services', 'Painting', 'Carpentry',
-      'General repairs & maintenance', 'Cleaning & environmental services', 'Vendor & contractor coordination',
+      'Facility supervision and management', 'Facility maintenance coordination', 'Plumbing services', 'Electrical maintenance',
+      'Painting', 'Carpentry', 'Facility and staff management',
     ],
-    image: { src: '/images/post-construction.jpg', alt: 'Post-construction clean-up in progress' },
+    image: { src: '/images/staff-hivis.jpg', alt: 'Kleener Touch FM staff member in a hi-vis vest cleaning an exterior window', position: '50% 30%' },
   },
   {
     id: 'pest',
-    tab: 'Pest Control',
-    blurb: 'Fumigation & scheduled treatments',
+    letter: 'D',
+    tab: 'Pest Control & Supplies',
+    blurb: 'Fumigation, chemicals & equipment',
     icon: 'shield',
-    title: 'Pest Control & Fumigation',
-    intro: 'Professional pest management solutions for residential, commercial and hospitality environments.',
-    items: [
-      'Fumigation', 'Pest control', 'Preventive pest management', 'Follow-up pest treatment',
-      'Scheduled pest control', 'Quarterly pest-control retainerships',
-    ],
-    image: { src: '/images/hero.jpg', alt: 'Kleener Touch team with sprayers and treatment equipment' },
-  },
-  {
-    id: 'supplies',
-    tab: 'Equipment & Supplies',
-    blurb: 'Chemicals, tools & equipment',
-    icon: 'box',
-    title: 'Cleaning Equipment & Supplies',
+    title: 'Pest Control & Facility Supplies',
     intro:
-      'We provide and procure cleaning products, equipment and consumables for clients — including our own Kleener Touch toilet wash and multipurpose liquid soap.',
+      'Professional pest management for homes, businesses and hospitality spaces, plus the chemicals, equipment and consumables that keep facilities running, including our own Kleener Touch products.',
     items: [
-      'Cleaning chemicals', 'Toilet wash', 'Multipurpose liquid soap', 'Cleaning tools', 'Wet & dry vacuum cleaners',
-      'Upholstery cleaning equipment', 'Floor-cleaning equipment', 'Cleaning consumables', 'Other facility equipment & materials',
+      'Fumigation', 'General pest control', 'Cleaning chemicals', 'Cleaning equipment procurement', 'Cleaning consumables and supplies',
     ],
-    image: { src: '/images/products.jpg', alt: 'Kleener Touch branded toilet wash and liquid soap products' },
+    image: { src: '/images/products.jpg', alt: 'Kleener Touch branded toilet wash and liquid soap products', position: '50% 50%' },
   },
 ];
 
+export const qualityControl = {
+  title: 'Supervision & Quality Control',
+  text: 'Every deployment is supported by operational supervision, performance monitoring and quality checks to ensure agreed service standards are consistently maintained.',
+};
+
 export const gallery = [
-  { src: '/images/bedroom-finish.jpg', alt: 'Finished bedroom after a Kleener Touch clean', caption: 'Residential finish', area: 'a' },
-  { src: '/images/cleaning-mop.jpg', alt: 'Janitor mopping a floor', caption: 'Janitorial', area: 'b' },
-  { src: '/images/post-construction.jpg', alt: 'Post-construction cleaning', caption: 'Post-construction', area: 'c' },
-  { src: '/images/vacuum.jpg', alt: 'Wet and dry vacuum cleaner', caption: 'Equipment supply', area: 'd' },
-  { src: '/images/housekeeping.jpg', alt: 'Housekeeping staff at work', caption: 'Housekeeping', area: 'e' },
-  { src: '/images/products.jpg', alt: 'Kleener Touch cleaning products', caption: 'Kleener Touch products', area: 'f' },
+  {
+    src: '/images/bathroom-detail.jpg', position: '50% 35%', service: 'Professional Cleaning Services',
+    title: 'Deep cleaning', text: 'Bathrooms cleaned top to bottom, with shelves and products put back in order.',
+    alt: 'Kleener Touch cleaner organising bathroom shelves',
+  },
+  {
+    src: '/images/curtain-dusting.jpg', position: '50% 30%', service: 'Professional Cleaning Services',
+    title: 'Detail work', text: 'Curtains, rails and high corners dusted, not skipped.',
+    alt: 'Kleener Touch cleaner dusting curtains with an extension pole',
+  },
+  {
+    src: '/images/cleaning-mop.jpg', position: '50% 40%', service: 'Janitorial & Housekeeping Services',
+    title: 'Janitorial services', text: 'Daily floor care that keeps offices and homes presentable.',
+    alt: 'Kleener Touch janitor mopping a floor',
+  },
+  {
+    src: '/images/post-construction.jpg', position: '50% 40%', service: 'Professional Cleaning Services',
+    title: 'Post-construction cleaning', text: 'Dust and site debris cleared so a new space is ready to use.',
+    alt: 'Post-construction clean-up in progress',
+  },
+  {
+    src: '/images/vacuum.jpg', position: '50% 50%', service: 'Pest Control & Facility Supplies',
+    title: 'Equipment procurement', text: 'Wet and dry vacuums and cleaning equipment supplied to clients.',
+    alt: 'Wet and dry vacuum cleaner supplied by Kleener Touch',
+  },
+  {
+    src: '/images/staff-uniform.jpg', position: '50% 30%', service: 'Facility Management Services',
+    title: 'Uniformed, reachable staff', text: 'Every team member wears Kleener Touch uniform with our number on it.',
+    alt: 'Kleener Touch staff member in a branded uniform',
+  },
 ];
 
 export const steps = [
@@ -199,12 +222,14 @@ export const founder = {
   quote:
     'When you entrust someone with your home, business, project or facility, you are entrusting them with something valuable. That responsibility is never lost on us.',
   bio:
-    'He holds a B.Tech in Agricultural Engineering from Ladoke Akintola University of Technology, Ogbomoso, and an M.Sc in Agricultural and Environmental Engineering from the University of Ibadan. His professional interests span facility management, operations, quality management, project management and service delivery.',
-  credentials: [
-    { title: 'Certified Facility Manager (CFM)', date: 'May 2022' },
-    { title: 'Associate Member, Global Institute of Project Management', date: 'May 2022' },
-    { title: 'QA/QC · ISO QMS Certified', date: 'June 2023' },
-    { title: 'Data Analysis Workshop, Centre for Management Development', date: 'Nov 2019' },
+    'His professional interests span facility management, operations, quality management, project management and service delivery, and he leads Kleener Touch with a focus on structure, supervision and fairness.',
+  qualifications: [
+    'BSc Agricultural Engineering',
+    'MSc Agricultural & Environmental Engineering',
+    'Certified Facility Manager (CFM)',
+    'Associate Member, Global Institute of Project Management',
+    'Professional training in management',
+    'Quality Assurance and Quality Control / ISO QMS certification',
   ],
 };
 

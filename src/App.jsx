@@ -1,5 +1,5 @@
 import Header from './components/Header';
-import Hero from './components/Hero';
+import Hero, { ClientMarquee } from './components/Hero';
 import Stats from './components/Stats';
 import About from './components/About';
 import Values from './components/Values';
@@ -10,7 +10,6 @@ import WhyUs from './components/WhyUs';
 import Industries from './components/Industries';
 import Clients from './components/Clients';
 import People from './components/People';
-import Leadership from './components/Leadership';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
 import { BookingProvider } from './components/booking/BookingProvider';
@@ -23,6 +22,7 @@ export default function App() {
       <main id="main">
         <Hero />
         <Stats />
+        <ClientMarquee />
         <About />
         <Values />
         <Services />
@@ -32,7 +32,6 @@ export default function App() {
         <Industries />
         <Clients />
         <People />
-        <Leadership />
         <Contact />
       </main>
       <Footer />

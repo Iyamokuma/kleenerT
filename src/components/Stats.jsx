@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { stats } from '../data/content';
+import { highlights } from '../data/content';
 import { useInView, prefersReducedMotion } from '../hooks/useInView';
 
 function CountUp({ value, from = 0, duration = 1200 }) {
@@ -22,16 +22,21 @@ function CountUp({ value, from = 0, duration = 1200 }) {
   return <span ref={ref}>{display}</span>;
 }
 
+/** Solid strip under the hero: the three figures the client wants highlighted. */
 export default function Stats() {
   return (
-    <section className="stats" aria-label="Company at a glance">
-      <div className="container stats-grid">
-        {stats.map(({ value, from, suffix, label }) => (
-          <div className="stat" key={label}>
-            <span className="stat-num"><CountUp value={value} from={from} />{suffix}</span>
-            <span className="stat-label">{label}</span>
-          </div>
-        ))}
+    <section className="highlights" aria-label="Kleener Touch at a glance">
+      <div className="container">
+        <ul className="highlights-grid">
+          {highlights.map(({ label, value, from, suffix }) => (
+            <li key={label}>
+              <span className="highlight-label">{label}</span>
+              <span className="highlight-num">
+                <CountUp value={value} from={from} />{suffix}
+              </span>
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
   );

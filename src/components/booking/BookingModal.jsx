@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import Icon from '../Icon';
-import { Bubbles } from '../Foam';
 import { bookingOptions, company } from '../../data/content';
 import { prefersReducedMotion } from '../../hooks/useInView';
 import '../../styles/booking.css';
@@ -10,7 +9,6 @@ import {
 } from './bookingLogic';
 
 const { propertyTypes, timeWindows, frequencies } = bookingOptions;
-const asideBubbles = [[10, 78, 26, 0], [22, 88, 12, 1.2], [78, 70, 34, .5], [86, 84, 14, 1.8]];
 const CLOSE_FALLBACK_MS = 450;
 
 function Field({ label, optional, error, children, className = '' }) {
@@ -361,7 +359,6 @@ export default function BookingModal({ open, presetService, onClose }) {
               <Icon name="phone" /> Prefer to talk? {company.phone}
             </a>
           </div>
-          <Bubbles items={asideBubbles} />
         </aside>
 
         <div className="bk-main">

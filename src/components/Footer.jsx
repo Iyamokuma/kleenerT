@@ -1,20 +1,16 @@
 import Icon from './Icon';
-import Foam, { Bubbles } from './Foam';
 import { Brand } from './Header';
 import { BookLink } from './booking/BookingProvider';
 import { company, navLinks, services } from '../data/content';
-
-const ctaBubbles = [[6, 58, 30, .4], [12, 70, 12, 1.4], [88, 54, 40, 0], [94, 64, 14, 1.8]];
 
 function CallToAction() {
   return (
     <div className="container">
       <div className="cta">
-        <img className="cta-bg" src="/images/bedroom-finish.jpg" alt="" loading="lazy" />
+        <img className="cta-bg" src="/images/bathroom-clean.jpg" alt="" loading="lazy" />
         <div className="cta-overlay" />
-        <Bubbles items={ctaBubbles} />
         <div className="cta-inner">
-          <h2>Ready for a spotless, well-managed space?</h2>
+          <h2>Clean spaces. Efficient facilities. Reliable people.</h2>
           <p>
             Let us handle the cleaning, staffing and upkeep while you focus on what matters most. We don’t just clean,
             we organize while at it.
@@ -24,7 +20,6 @@ function CallToAction() {
             <a href={company.phoneHref} className="btn btn-glass btn-lg"><Icon name="phone" /> Call {company.phone}</a>
           </div>
         </div>
-        <Foam className="cta-foam" />
       </div>
     </div>
   );
@@ -39,8 +34,8 @@ export default function Footer() {
         <div className="footer-brand">
           <Brand />
           <p>
-            Your trusted partner for professional cleaning, janitorial &amp; housekeeping outsourcing, facility
-            management, pest control and facility supplies — from homes to corporate facilities.
+            Your trusted partner for professional cleaning, janitorial &amp; housekeeping, facility management, pest
+            control and facility supplies, from homes to corporate facilities.
           </p>
           <div className="socials">
             <a href={company.instagram.url} target="_blank" rel="noopener noreferrer" aria-label={`Instagram ${company.instagram.handle}`}><Icon name="instagram" /></a>

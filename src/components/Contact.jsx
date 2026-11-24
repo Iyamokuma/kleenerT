@@ -9,8 +9,8 @@ export default function Contact() {
         <div className="contact-copy">
           <span className="kicker">Book a service</span>
           <h2>Let’s keep your facility working.</h2>
-          <p>
-            Every facility has different needs. Our promise is to listen, understand, respond and deliver — whether it’s
+          <p className="justify">
+            Every facility has different needs. Our promise is to listen, understand, respond and deliver, whether it’s
             a home, an office, a hotel or a corporate facility.
           </p>
 
@@ -31,7 +31,7 @@ export default function Contact() {
         </div>
 
         <div className="book-card">
-          <span className="book-card-icon"><Icon name="calendar" /></span>
+          <img className="book-card-img" src="/images/bedroom-finish.jpg" alt="A freshly cleaned and made-up bedroom" loading="lazy" />
           <h3>Book in under a minute</h3>
           <p>Pick a service, choose a date and leave your number. We’ll call to confirm the details.</p>
           <ol className="book-card-steps">

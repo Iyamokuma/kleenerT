@@ -1,13 +1,8 @@
 import Icon from './Icon';
 import { BookLink } from './booking/BookingProvider';
-import Foam, { Bubbles } from './Foam';
-import { clients, company } from '../data/content';
+import { clients, hero } from '../data/content';
 
-const heroBubbles = [
-  [4, 74, 14, 0], [8, 70, 34, 1.2], [91, 62, 46, .6], [96, 70, 18, 2], [70, 78, 24, 1.6], [56, 20, 10, .3],
-];
-
-function ClientMarquee() {
+export function ClientMarquee() {
   // Rendered twice so the CSS loop can translate by exactly half its width.
   const row = (hidden) => (
     <ul className="marquee-row" aria-hidden={hidden || undefined}>
@@ -28,42 +23,30 @@ function ClientMarquee() {
 }
 
 export default function Hero() {
+  const [first, middle, last] = hero.headline;
   return (
-    <>
-      <section className="hero">
-        <img
-          className="hero-bg"
-          src="/images/hero.jpg"
-          alt=""
-          width="1280"
-          height="765"
-          fetchPriority="high"
-        />
-        <div className="hero-overlay" />
-        <Bubbles items={heroBubbles} />
+    <section className="hero">
+      <img
+        className="hero-bg"
+        src="/images/hero.jpg"
+        alt=""
+        width="1280"
+        height="765"
+        fetchPriority="high"
+      />
+      <div className="hero-overlay" />
 
-        <div className="container hero-inner">
-          <h1>Keep your space <span className="accent">spotless</span> and working.</h1>
-          <p className="lead">
-            {company.slogan} Professional cleaning, housekeeping, facility management and pest control for homes,
-            offices and businesses across Nigeria.
-          </p>
-          <div className="hero-actions">
-            <BookLink className="btn btn-primary btn-lg">Book a service <Icon name="arrow" /></BookLink>
-            <a href="#services" className="btn btn-glass btn-lg">Our services</a>
-          </div>
-          <div className="hero-proof">
-            <span><strong>98%+</strong> customer retention</span>
-            <span className="sep" />
-            <span><strong>30+</strong> trained staff</span>
-            <span className="sep" />
-            <span>RC {company.rc}</span>
-          </div>
+      <div className="container hero-inner">
+        <h1>
+          <span>{first}</span> <span>{middle}</span> <span className="accent">{last}</span>
+        </h1>
+        <p className="lead">{hero.lead}</p>
+        <p className="hero-sub">{hero.sub}</p>
+        <div className="hero-actions">
+          <BookLink className="btn btn-light btn-lg">Book a service <Icon name="arrow" /></BookLink>
+          <a href="#services" className="btn btn-glass btn-lg">Our services</a>
         </div>
-
-        <Foam className="hero-foam" />
-      </section>
-      <ClientMarquee />
-    </>
+      </div>
+    </section>
   );
 }

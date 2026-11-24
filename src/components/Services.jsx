@@ -1,22 +1,68 @@
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import Icon from './Icon';
+import Reveal from './Reveal';
 import { BookLink } from './booking/BookingProvider';
 import SectionHead from './SectionHead';
-import { services } from '../data/content';
+import { qualityControl, services } from '../data/content';
+import { useMedia } from '../hooks/useMedia';
+
+function ServiceBody({ s }) {
+  return (
+    <>
+      <p className="justify svc-intro">{s.intro}</p>
+      <ul className="checklist cols-2">
+        {s.items.map((item) => <li key={item}>{item}</li>)}
+      </ul>
+      <BookLink service={s.title} className="btn btn-primary btn-sm svc-cta">
+        Book this service <Icon name="arrow" />
+      </BookLink>
+    </>
+  );
+}
+
+function ServiceImage({ s }) {
+  return (
+    <div className="svc-media">
+      <img src={s.image.src} alt={s.image.alt} loading="lazy" style={{ objectPosition: s.image.position }} />
+      <span className="svc-letter" aria-hidden="true">{s.letter}</span>
+    </div>
+  );
+}
+
+/** Phones: one group open at a time, so the section stays short. */
+function ServiceAccordion() {
+  const [open, setOpen] = useState(services[0].id);
+  return (
+    <div className="svc-accordion">
+      {services.map((s) => {
+        const expanded = open === s.id;
+        return (
+          <article key={s.id} className={`svc-acc${expanded ? ' is-open' : ''}`}>
+            <h3>
+              <button
+                type="button"
+                aria-expanded={expanded}
+                aria-controls={`svc-${s.id}`}
+                onClick={() => setOpen(expanded ? null : s.id)}
+              >
+                <span className="svc-acc-letter" aria-hidden="true">{s.letter}</span>
+                <span className="svc-acc-title">{s.title}<small>{s.items.length} services</small></span>
+                <span className="svc-acc-chev" aria-hidden="true" />
+              </button>
+            </h3>
+            <div id={`svc-${s.id}`} className="svc-acc-body" hidden={!expanded}>
+              <ServiceImage s={s} />
+              <ServiceBody s={s} />
+            </div>
+          </article>
+        );
+      })}
+    </div>
+  );
+}
 
 export default function Services() {
-  const [activeId, setActiveId] = useState(services[0].id);
-  const tabRefs = useRef({});
-
-  // WAI-ARIA tabs: arrow keys move focus and selection
-  const onKeyDown = (e, index) => {
-    const step = { ArrowRight: 1, ArrowLeft: -1 }[e.key];
-    if (!step) return;
-    e.preventDefault();
-    const next = services[(index + step + services.length) % services.length];
-    setActiveId(next.id);
-    tabRefs.current[next.id]?.focus();
-  };
+  const compact = useMedia('(max-width: 760px)');
 
   return (
     <section className="section" id="services">
@@ -26,51 +72,27 @@ export default function Services() {
           dependable partner.
         </SectionHead>
 
-        <div className="tabs" role="tablist" aria-label="Service categories">
-          {services.map((s, i) => {
-            const selected = s.id === activeId;
-            return (
-              <button
-                key={s.id}
-                ref={(el) => { tabRefs.current[s.id] = el; }}
-                type="button"
-                role="tab"
-                id={`tab-${s.id}`}
-                aria-controls={`panel-${s.id}`}
-                aria-selected={selected}
-                tabIndex={selected ? 0 : -1}
-                onClick={() => setActiveId(s.id)}
-                onKeyDown={(e) => onKeyDown(e, i)}
-              >
-                <Icon name={s.icon} />
-                {s.tab}
-              </button>
-            );
-          })}
-        </div>
-
-        {services.map((s) => (
-          <div
-            key={s.id}
-            className="panel"
-            role="tabpanel"
-            id={`panel-${s.id}`}
-            aria-labelledby={`tab-${s.id}`}
-            hidden={s.id !== activeId}
-          >
-            <div className="panel-copy">
-              <h3>{s.title}</h3>
-              <p>{s.intro}</p>
-              <ul className="checklist cols-2">
-                {s.items.map((item) => <li key={item}>{item}</li>)}
-              </ul>
-              <BookLink service={s.title} className="btn btn-primary panel-cta">
-                Book this service <Icon name="arrow" />
-              </BookLink>
-            </div>
-            <img className="panel-img" src={s.image.src} alt={s.image.alt} loading="lazy" />
+        {compact ? <ServiceAccordion /> : (
+          <div className="svc-grid">
+            {services.map((s, i) => (
+              <Reveal as="article" key={s.id} className="svc-card" delay={(i % 2) * 80}>
+                <ServiceImage s={s} />
+                <div className="svc-card-body">
+                  <h3><span className="sr-only">{s.letter}. </span>{s.title}</h3>
+                  <ServiceBody s={s} />
+                </div>
+              </Reveal>
+            ))}
           </div>
-        ))}
+        )}
+
+        <Reveal className="qc-band">
+          <span className="qc-icon"><Icon name="shield" /></span>
+          <div>
+            <h3>{qualityControl.title}</h3>
+            <p className="justify">{qualityControl.text}</p>
+          </div>
+        </Reveal>
       </div>
     </section>
   );
